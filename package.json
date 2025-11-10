@@ -1,0 +1,35 @@
+{
+  "name": "pdf-screenshot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop pdf-screenshot",
+    "pm2:restart": "pm2 restart pdf-screenshot",
+    "pm2:delete": "pm2 delete pdf-screenshot",
+    "pm2:logs": "pm2 logs pdf-screenshot",
+    "pm2:status": "pm2 status"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.926.0",
+    "@aws-sdk/s3-request-presigner": "^3.926.0",
+    "@fastify/env": "^5.0.3",
+    "canvas": "3.2.0",
+    "fastify": "^5.6.1",
+    "pdfjs-dist": "3.4.120",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "@types/pdfjs-dist": "^2.10.377"
+  }
+}
