@@ -380,12 +380,3 @@ npm run pm2:delete
 npm run build
 npm run pm2:start
 ```
-
-## License
-
-ISC
-
-## Author
-
-Add your name/organization here
-
