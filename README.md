@@ -7,11 +7,12 @@ A high-performance Fastify server that generates thumbnail images from PDF docum
 - 🚀 Fast PDF rendering using `pdfjs-dist` and `node-canvas`
 - 📸 Generates PNG thumbnails from the first page of PDFs
 - ☁️ Automatic upload to Cloudflare R2 storage
+- 🔐 Bearer token authentication for API security
 - 📚 Interactive Swagger/OpenAPI documentation
 - 🛡️ Built-in rate limiting to prevent abuse
 - 🔄 Process management with PM2
 - 📝 Comprehensive logging and error handling
-- 🔐 Production-ready TypeScript codebase
+- 💎 Production-ready TypeScript codebase
 
 ## Prerequisites
 
@@ -50,6 +51,7 @@ Required environment variables:
 - `R2_MAIN_BUCKET_NAME` - Your R2 bucket name
 - `PORT` - Server port (default: 3000)
 - `SERVER_URL` - Full server URL for API documentation (default: http://localhost:3000)
+- `API_KEYS` - Comma-separated list of API keys for authentication (required)
 
 4. Build the TypeScript code:
 ```bash
@@ -112,6 +114,54 @@ npm run build
 npm run pm2:restart
 ```
 
+## Authentication
+
+The API uses **Bearer Token authentication**. All endpoints require a valid API key.
+
+### Getting Your API Key
+
+API keys are managed via the `API_KEYS` environment variable in `.env`.
+
+### Generate a New API Key
+
+```bash
+node -e "console.log('sk_live_' + require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Add the generated key to your `.env` file:
+```bash
+API_KEYS=sk_live_your_generated_key_here
+```
+
+For multiple keys (comma-separated):
+```bash
+API_KEYS=sk_live_key1...,sk_live_key2...,sk_live_key3...
+```
+
+### Using Your API Key
+
+Include the API key in the `Authorization` header:
+
+```bash
+curl -X POST http://localhost:3000/upload/pdf-screenshot \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com/document.pdf"}'
+```
+
+### Unauthorized Response
+
+Requests without a valid API key will receive:
+
+```json
+HTTP 401 Unauthorized
+{
+  "statusCode": 401,
+  "error": "Unauthorized",
+  "message": "Invalid or missing API key. Include \"Authorization: Bearer YOUR_API_KEY\" header."
+}
+```
+
 ## API Documentation
 
 ### Interactive API Docs
@@ -122,11 +172,14 @@ Once the server is running, visit the interactive Swagger UI documentation:
 http://localhost:3000/docs
 ```
 
+Click the **🔒 Authorize** button and enter your API key to test endpoints.
+
 The documentation provides:
 - 📚 Complete API reference for all endpoints
 - 🧪 Interactive "Try it out" feature to test endpoints
 - 📋 Request/response schemas with examples
 - 🏷️ Organized by tags (health, upload)
+- 🔐 Built-in authentication testing
 
 ### API Endpoints
 
@@ -134,6 +187,11 @@ The documentation provides:
 
 ```http
 GET /
+```
+
+**Headers:**
+```
+Authorization: Bearer YOUR_API_KEY
 ```
 
 **Response:**
@@ -147,6 +205,14 @@ GET /
 
 ```http
 POST /upload/pdf-screenshot
+```
+
+**Authentication:** Required
+
+**Headers:**
+```
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
 ```
 
 **Rate Limit:** 10 requests per hour per IP address
@@ -164,6 +230,15 @@ POST /upload/pdf-screenshot
   "success": true,
   "path": "test/thumb-document.png",
   "publicUrl": "https://your-r2-domain.com/test/thumb-document.png"
+}
+```
+
+**Unauthorized Response (401):**
+```json
+{
+  "statusCode": 401,
+  "error": "Unauthorized",
+  "message": "Invalid or missing API key. Include \"Authorization: Bearer YOUR_API_KEY\" header."
 }
 ```
 

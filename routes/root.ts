@@ -1,8 +1,9 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
-import { rateLimitResponse } from "../schemas/common-responses";
+import { rateLimitResponse, unauthorizedResponse } from "../schemas/common-responses";
 
 const rootRoute: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.get("/", {
+    onRequest: fastify.verifyBearerAuth,
     schema: {
       description: "Health check endpoint",
       tags: ["health"],
@@ -13,7 +14,8 @@ const rootRoute: FastifyPluginAsync = async (fastify: FastifyInstance) => {
             message: { type: "string" },
           },
         },
-        ...rateLimitResponse, // ✨ Reusable!
+        ...unauthorizedResponse, // ✨ Reusable!
+        ...rateLimitResponse,    // ✨ Reusable!
       },
     },
     handler: async (request, reply) => {

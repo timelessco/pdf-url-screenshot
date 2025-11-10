@@ -31,6 +31,10 @@ export const envSchema = {
       type: "string",
       default: "http://localhost:3000",
     },
+    API_KEYS: {
+      type: "string",
+      default: "",
+    },
   },
 };
 
@@ -45,6 +49,7 @@ declare module "fastify" {
       R2_PUBLIC_BUCKET_URL: string;
       R2_MAIN_BUCKET_NAME: string;
       SERVER_URL: string;
+      API_KEYS: string;
     };
   }
 }

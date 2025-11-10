@@ -5,13 +5,14 @@ import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
 import { createR2Client, createR2Helpers } from "../../r2Client";
 import { PdfScreenshotRequest, PdfScreenshotResponse } from "../../types";
 import { pdfEndpointRateLimitConfig } from "../../rate-limit.config";
-import { badRequestResponse, rateLimitResponse, serverErrorResponse } from "../../schemas/common-responses";
+import { badRequestResponse, rateLimitResponse, serverErrorResponse, unauthorizedResponse } from "../../schemas/common-responses";
 
 const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.post<{
     Body: PdfScreenshotRequest;
     Reply: PdfScreenshotResponse;
   }>("/upload/pdf-screenshot", {
+    onRequest: fastify.verifyBearerAuth,
     config: {
       rateLimit: pdfEndpointRateLimitConfig,
     },
@@ -43,9 +44,10 @@ const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) 
             },
           },
         },
-        ...badRequestResponse, // ✨ Reusable!
-        ...rateLimitResponse,  // ✨ Reusable!
-        ...serverErrorResponse, // ✨ Reusable!
+        ...badRequestResponse,    // ✨ Reusable!
+        ...unauthorizedResponse,  // ✨ Reusable!
+        ...rateLimitResponse,     // ✨ Reusable!
+        ...serverErrorResponse,   // ✨ Reusable!
       },
     },
     handler: async (request, reply) => {
