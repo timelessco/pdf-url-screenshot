@@ -27,6 +27,10 @@ export const envSchema = {
       type: "string",
       default: "recollect",
     },
+    SERVER_URL: {
+      type: "string",
+      default: "http://localhost:3000",
+    },
   },
 };
 
@@ -40,6 +44,7 @@ declare module "fastify" {
       R2_SECRET_ACCESS_KEY: string;
       R2_PUBLIC_BUCKET_URL: string;
       R2_MAIN_BUCKET_NAME: string;
+      SERVER_URL: string;
     };
   }
 }

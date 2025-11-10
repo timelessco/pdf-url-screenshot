@@ -9,7 +9,53 @@ const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) 
   fastify.post<{
     Body: PdfScreenshotRequest;
     Reply: PdfScreenshotResponse;
-  }>("/upload/pdf-screenshot", async (request, reply) => {
+  }>("/upload/pdf-screenshot", {
+    schema: {
+      description: "Generate a thumbnail image from a PDF and upload to R2 storage",
+      tags: ["upload"],
+      body: {
+        type: "object",
+        required: ["url"],
+        properties: {
+          url: {
+            type: "string",
+            description: "URL of the PDF file to process",
+          },
+        },
+      },
+      response: {
+        200: {
+          type: "object",
+          properties: {
+            success: { type: "boolean" },
+            path: {
+              type: "string",
+              description: "R2 storage path of the thumbnail",
+            },
+            publicUrl: {
+              type: "string",
+              description: "Public URL to access the thumbnail",
+            },
+          },
+        },
+        400: {
+          type: "object",
+          properties: {
+            success: { type: "boolean" },
+            error: { type: "string" },
+          },
+        },
+        500: {
+          type: "object",
+          properties: {
+            success: { type: "boolean" },
+            error: { type: "string" },
+            details: { type: "string" },
+          },
+        },
+      },
+    },
+    handler: async (request, reply) => {
     try {
       // Initialize R2 client with config
       const r2Client = createR2Client({
@@ -169,6 +215,7 @@ const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) 
         details: error instanceof Error ? error.message : String(error),
       });
     }
+    },
   });
 };
 

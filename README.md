@@ -7,6 +7,7 @@ A high-performance Fastify server that generates thumbnail images from PDF docum
 - 🚀 Fast PDF rendering using `pdfjs-dist` and `node-canvas`
 - 📸 Generates PNG thumbnails from the first page of PDFs
 - ☁️ Automatic upload to Cloudflare R2 storage
+- 📚 Interactive Swagger/OpenAPI documentation
 - 🔄 Process management with PM2
 - 📝 Comprehensive logging and error handling
 - 🔐 Production-ready TypeScript codebase
@@ -47,6 +48,7 @@ Required environment variables:
 - `R2_PUBLIC_BUCKET_URL` - Your public bucket URL
 - `R2_MAIN_BUCKET_NAME` - Your R2 bucket name
 - `PORT` - Server port (default: 3000)
+- `SERVER_URL` - Full server URL for API documentation (default: http://localhost:3000)
 
 4. Build the TypeScript code:
 ```bash
@@ -109,9 +111,25 @@ npm run build
 npm run pm2:restart
 ```
 
-## API Endpoints
+## API Documentation
 
-### Health Check
+### Interactive API Docs
+
+Once the server is running, visit the interactive Swagger UI documentation:
+
+```
+http://localhost:3000/docs
+```
+
+The documentation provides:
+- 📚 Complete API reference for all endpoints
+- 🧪 Interactive "Try it out" feature to test endpoints
+- 📋 Request/response schemas with examples
+- 🏷️ Organized by tags (health, upload)
+
+### API Endpoints
+
+#### Health Check
 
 ```http
 GET /
@@ -120,11 +138,11 @@ GET /
 **Response:**
 ```json
 {
-  "message": "Hello from Hetzner Node server falsify"
+  "message": "Hello from Hetzner Node server fastify"
 }
 ```
 
-### Generate PDF Screenshot
+#### Generate PDF Screenshot
 
 ```http
 POST /upload/pdf-screenshot
@@ -178,6 +196,7 @@ PM2 automatically rotates logs with these settings:
 pdf-screenshot/
 ├── index.ts              # Main server file with Fastify initialization
 ├── env.schema.ts         # Environment variable schema and types
+├── swagger.config.ts     # Swagger/OpenAPI configuration
 ├── types.ts              # TypeScript type definitions
 ├── r2Client.ts           # R2 storage client
 ├── routes/               # Route handlers
