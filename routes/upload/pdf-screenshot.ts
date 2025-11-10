@@ -125,7 +125,6 @@ const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) 
       try {
         console.log(`[Line 68] Getting first page of PDF`);
         firstPage = await pdf.getPage(1);
-        console.log('iiiiiiiiiii~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', firstPage)
       } catch (error) {
         console.error(`[Line 68] FAILED at pdf.getPage(1)`, error);
         return reply.status(500).send({
