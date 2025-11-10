@@ -2,8 +2,10 @@ import Fastify from "fastify";
 import fastifyEnv from "@fastify/env";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
+import fastifyRateLimit from "@fastify/rate-limit";
 import { envSchema } from "./env.schema";
 import { createSwaggerOptions, swaggerUiOptions } from "./swagger.config";
+import { globalRateLimitConfig } from "./rate-limit.config";
 import rootRoute from "./routes/root";
 import pdfScreenshotRoute from "./routes/upload/pdf-screenshot";
 
@@ -25,6 +27,10 @@ const start = async () => {
     console.log(`[Config] R2 Account ID: ${fastify.config.R2_ACCOUNT_ID}`);
     console.log(`[Config] R2 Bucket: ${fastify.config.R2_MAIN_BUCKET_NAME}`);
     console.log(`[Config] Server URL: ${fastify.config.SERVER_URL}`);
+
+    // Register rate limiting
+    await fastify.register(fastifyRateLimit, globalRateLimitConfig);
+    console.log(`[Rate Limit] Global: ${globalRateLimitConfig.max} requests per ${globalRateLimitConfig.timeWindow}`);
 
     // Register Swagger for API documentation
     await fastify.register(fastifySwagger, createSwaggerOptions(fastify.config.SERVER_URL));

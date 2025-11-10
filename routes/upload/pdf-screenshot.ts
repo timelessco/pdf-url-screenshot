@@ -4,14 +4,19 @@ import { createCanvas } from "canvas";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
 import { createR2Client, createR2Helpers } from "../../r2Client";
 import { PdfScreenshotRequest, PdfScreenshotResponse } from "../../types";
+import { pdfEndpointRateLimitConfig } from "../../rate-limit.config";
+import { badRequestResponse, rateLimitResponse, serverErrorResponse } from "../../schemas/common-responses";
 
 const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.post<{
     Body: PdfScreenshotRequest;
     Reply: PdfScreenshotResponse;
   }>("/upload/pdf-screenshot", {
+    config: {
+      rateLimit: pdfEndpointRateLimitConfig,
+    },
     schema: {
-      description: "Generate a thumbnail image from a PDF and upload to R2 storage",
+      description: "Generate a thumbnail image from a PDF and upload to R2 storage (Rate limited: 10 requests per hour)",
       tags: ["upload"],
       body: {
         type: "object",
@@ -38,21 +43,9 @@ const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) 
             },
           },
         },
-        400: {
-          type: "object",
-          properties: {
-            success: { type: "boolean" },
-            error: { type: "string" },
-          },
-        },
-        500: {
-          type: "object",
-          properties: {
-            success: { type: "boolean" },
-            error: { type: "string" },
-            details: { type: "string" },
-          },
-        },
+        ...badRequestResponse, // ✨ Reusable!
+        ...rateLimitResponse,  // ✨ Reusable!
+        ...serverErrorResponse, // ✨ Reusable!
       },
     },
     handler: async (request, reply) => {

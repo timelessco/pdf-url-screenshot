@@ -8,6 +8,7 @@ A high-performance Fastify server that generates thumbnail images from PDF docum
 - 📸 Generates PNG thumbnails from the first page of PDFs
 - ☁️ Automatic upload to Cloudflare R2 storage
 - 📚 Interactive Swagger/OpenAPI documentation
+- 🛡️ Built-in rate limiting to prevent abuse
 - 🔄 Process management with PM2
 - 📝 Comprehensive logging and error handling
 - 🔐 Production-ready TypeScript codebase
@@ -148,6 +149,8 @@ GET /
 POST /upload/pdf-screenshot
 ```
 
+**Rate Limit:** 10 requests per hour per IP address
+
 **Request Body:**
 ```json
 {
@@ -173,6 +176,57 @@ POST /upload/pdf-screenshot
 }
 ```
 
+**Rate Limit Response (429):**
+```json
+{
+  "statusCode": 429,
+  "error": "Too Many Requests",
+  "message": "PDF processing rate limit exceeded. Maximum 10 requests per hour. Try again in 45 minutes.",
+  "retryAfter": 2700000
+}
+```
+
+**Rate Limit Headers:**
+All responses include rate limit information:
+```
+x-ratelimit-limit: 10
+x-ratelimit-remaining: 7
+x-ratelimit-reset: 1640000000000
+```
+
+## Rate Limiting
+
+The API implements rate limiting to prevent abuse and ensure fair usage:
+
+### Global Rate Limits
+- **100 requests per minute** per IP address across all endpoints
+- Applies to all API calls
+
+### Endpoint-Specific Limits
+- **Health Check (`GET /`)**: 100 requests per minute
+- **PDF Processing (`POST /upload/pdf-screenshot`)**: 10 requests per hour
+
+### Rate Limit Headers
+Every response includes these headers:
+- `x-ratelimit-limit` - Maximum requests allowed in time window
+- `x-ratelimit-remaining` - Requests remaining in current window
+- `x-ratelimit-reset` - Unix timestamp when the limit resets
+
+### Rate Limit Exceeded
+When you exceed the limit, you'll receive:
+```json
+HTTP 429 Too Many Requests
+{
+  "statusCode": 429,
+  "error": "Too Many Requests", 
+  "message": "Rate limit exceeded. Try again later.",
+  "retryAfter": 3600000
+}
+```
+
+### Whitelisted IPs
+- Localhost (127.0.0.1) is whitelisted for development
+
 ## Configuration
 
 ### PM2 Configuration (`ecosystem.config.js`)
@@ -197,8 +251,11 @@ pdf-screenshot/
 ├── index.ts              # Main server file with Fastify initialization
 ├── env.schema.ts         # Environment variable schema and types
 ├── swagger.config.ts     # Swagger/OpenAPI configuration
+├── rate-limit.config.ts  # Rate limiting configuration
 ├── types.ts              # TypeScript type definitions
 ├── r2Client.ts           # R2 storage client
+├── schemas/              # Reusable schemas
+│   └── common-responses.ts  # Common response schemas (400, 401, 429, 500)
 ├── routes/               # Route handlers
 │   ├── root.ts           # GET / endpoint
 │   └── upload/
