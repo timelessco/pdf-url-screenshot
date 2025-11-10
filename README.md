@@ -176,8 +176,14 @@ PM2 automatically rotates logs with these settings:
 
 ```
 pdf-screenshot/
-├── index.ts              # Main server file
+├── index.ts              # Main server file with Fastify initialization
+├── env.schema.ts         # Environment variable schema and types
+├── types.ts              # TypeScript type definitions
 ├── r2Client.ts           # R2 storage client
+├── routes/               # Route handlers
+│   ├── root.ts           # GET / endpoint
+│   └── upload/
+│       └── pdf-screenshot.ts  # POST /upload/pdf-screenshot endpoint
 ├── ecosystem.config.js   # PM2 configuration
 ├── tsconfig.json         # TypeScript configuration
 ├── package.json          # Dependencies and scripts
