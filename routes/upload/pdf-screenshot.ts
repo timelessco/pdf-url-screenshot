@@ -21,11 +21,15 @@ const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) 
       tags: ["upload"],
       body: {
         type: "object",
-        required: ["url"],
+        required: ["url", "userId"],
         properties: {
           url: {
             type: "string",
             description: "URL of the PDF file to process",
+          },
+          userId: {
+            type: "string",
+            description: "User ID for organizing thumbnails in user-specific folders",
           },
         },
       },
@@ -62,7 +66,7 @@ const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) 
       const r2Helpers = createR2Helpers(r2Client, fastify.config.R2_PUBLIC_BUCKET_URL);
       const R2_MAIN_BUCKET_NAME = fastify.config.R2_MAIN_BUCKET_NAME;
 
-      const { url } = request.body;
+      const { url, userId } = request.body;
 
 
       // Fetch PDF bytes
@@ -162,7 +166,7 @@ const pdfScreenshotRoute: FastifyPluginAsync = async (fastify: FastifyInstance) 
       );
       const baseName = decodedName.replace(/\.pdf$/iu, "");
       const thumbnailFileName = `thumb-${baseName}.png`;
-      const key = `test/${thumbnailFileName}`;
+      const key = `pdf_thumbnails/${userId}/${thumbnailFileName}`;
 
       // Upload to R2 directly from server
       let uploadResult;

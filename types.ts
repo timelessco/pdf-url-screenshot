@@ -1,5 +1,6 @@
 export type PdfScreenshotRequest = {
   url: string;
+  userId: string;
 };
 
 export type PdfScreenshotResponse = {

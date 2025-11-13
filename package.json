@@ -1,7 +1,7 @@
 {
   "name": "pdf-screenshot",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.2.0",
+  "description": "A high-performance API that generates thumbnail images from PDF documents and uploads them to Cloudflare R2 storage",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
@@ -13,7 +13,10 @@
     "pm2:restart": "pm2 restart pdf-screenshot",
     "pm2:delete": "pm2 delete pdf-screenshot",
     "pm2:logs": "pm2 logs pdf-screenshot",
-    "pm2:status": "pm2 status"
+    "pm2:status": "pm2 status",
+    "version:patch": "npm version patch && git push --follow-tags",
+    "version:minor": "npm version minor && git push --follow-tags",
+    "version:major": "npm version major && git push --follow-tags"
   },
   "keywords": [],
   "author": "",
